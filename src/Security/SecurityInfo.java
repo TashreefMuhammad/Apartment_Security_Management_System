@@ -118,27 +118,40 @@ public class SecurityInfo extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        try{
-            String s1=jTextField1.getText();
-            int s=Integer.parseInt(s1);
-            PreparedStatement statement = connected.prepareStatement("SELECT * from GuestInfo where GuestId="+s);
+        try {
+            String s1 = jTextField1.getText();
+            boolean f = true;
+            PreparedStatement statement = connected.prepareStatement("SELECT * from GuestInfo where GuestId=" + s1);
             ResultSet resultSet = statement.executeQuery();
-            //while(resultSet.next()){
-            //    System.out.println(resultSet.getString("GuestId")+" "+resultSet.getString("GuestName")+" "+resultSet.getString("ContactNo"));
-            //}
-            if(s==resultSet.getInt("GuestId")){
-                jLabel4.setText(resultSet.getString("GuestName"));
-                jLabel5.setText(resultSet.getString("ContactNo"));
+            while (resultSet.next()) {
+                    jLabel4.setText(resultSet.getString("GuestName"));
+                    jLabel5.setText(resultSet.getString("ContactNo"));
+                    f = false;
             }
-            else{
+            this.dispose();
+            if(f){
                 NewGuest.main(null);
             }
-        }catch(SQLException e){
+            else{
+                Id=getId(jTextField1.getText());
+                Name=getName(jLabel4.getText());
+                Contact=getContact(jLabel5.getText());
+                InformationDisplay.main(null);
+            }
+        } catch (SQLException e) {
             System.out.println("Error found at SecurityInfo Class");
             System.out.println("Error: " + e);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
-
+    public String getId(String id){
+        return id;
+    }
+    public String getName(String name){
+        return name;
+    }
+    public String getContact(String contact){
+        return contact;
+    }
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         this.dispose();
         Login.main(null);
@@ -170,16 +183,18 @@ public class SecurityInfo extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(SecurityInfo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
-        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new SecurityInfo().setVisible(true);
             }
         });
     }
-
+    public static String Id,Name,Contact;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;

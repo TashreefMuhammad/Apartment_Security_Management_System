@@ -5,10 +5,14 @@
  */
 package Security;
 
+import static Security.SecurityInfo.Id;
+import static Security.SecurityInfo.Contact;
+import static Security.SecurityInfo.Name;
 import static SigningIn.ConnectMSSQL.connected;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  *
@@ -111,10 +115,16 @@ public class NewGuest extends javax.swing.JFrame {
             String s1 = jTextField1.getText();
             String s2 = jTextField2.getText();
 
-            PreparedStatement statement = connected.prepareStatement("Insert into GuestInfo(GuestName,ContactNo) values('"+s1+"','"+s2+"')");
-            ResultSet resultSet = statement.executeQuery();
+            Name = s1;
+            Contact = s2;
+            PreparedStatement statement = connected.prepareStatement("Insert into GuestInfo(GuestName,ContactNo) values('" + s1 + "','" + s2 + "')", Statement.RETURN_GENERATED_KEYS);
+            statement.execute();
+            ResultSet rs = statement.getGeneratedKeys();
+            if (rs.next()) {
+                Id = Integer.toString(rs.getInt(1));
+            }
             this.dispose();
-            SecurityInfo.main(null);
+            InformationDisplay.main(null);
         } catch (SQLException e) {
             System.out.println("Error found at NewGuest Class");
             System.out.println("Error: " + e);
