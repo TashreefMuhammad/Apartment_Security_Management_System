@@ -131,6 +131,9 @@ public class Login extends javax.swing.JFrame {
         String s2 = jPasswordField1.getText();
         String s3 = (String) jComboBox1.getSelectedItem();
         
+        UserName = getString(s1);
+        Password = getString(s2);
+        
         while(s3 == "--"){
             JOptionPane.showMessageDialog(null,"Please Select Your  Login Type First");
             s3=null;
@@ -158,7 +161,9 @@ public class Login extends javax.swing.JFrame {
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jComboBox1ActionPerformed
-
+    String getString(String s){
+        return s;
+    }
     /**
      * @param args the command line arguments
      */
@@ -203,4 +208,5 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
+    public static String UserName,Password;
 }

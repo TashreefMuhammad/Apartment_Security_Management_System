@@ -13,9 +13,14 @@ import static Security.SecurityInfo.Contact;
 import static Security.SecurityInfo.Id;
 import static Security.SecurityInfo.Name;
 import static SigningIn.ConnectMSSQL.connected;
+import static SigningIn.Login.Password;
+import static SigningIn.Login.UserName;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class InformationDisplay extends javax.swing.JFrame {
@@ -28,6 +33,25 @@ public class InformationDisplay extends javax.swing.JFrame {
         jLabel7.setText(Id);
         jLabel4.setText(Name);
         jLabel5.setText(Contact);
+        try {
+            PreparedStatement statement = connected.prepareStatement("SELECT * from Persons");
+            statement.execute();
+            ResultSet resultSet = statement.executeQuery();
+            DefaultTableModel tb = (DefaultTableModel) jTable2.getModel();
+            tb.setRowCount(0);
+            tb.setColumnIdentifiers(new Object[]{"Name", "FlatNo", "ContactNo"});
+            Object[] row = new Object[3];
+            while (resultSet.next()) {
+                row[0] = resultSet.getString("Name");
+                row[1] = resultSet.getString("FlatNo");
+                row[2] = resultSet.getString("ContactNo");
+                tb.addRow(row);
+            }
+            jTable2.setModel(tb);
+        } catch (SQLException e) {
+            System.out.println("Error found at InformationDisplay");
+            System.out.println("Error: " + e);
+        }
     }
 
     /**
@@ -141,8 +165,7 @@ public class InformationDisplay extends javax.swing.JFrame {
                 .addGap(36, 36, 36)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jButton2))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -154,7 +177,8 @@ public class InformationDisplay extends javax.swing.JFrame {
                                 .addGap(3, 3, 3)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel8)
-                                    .addComponent(jLabel6))))
+                                    .addComponent(jLabel6)
+                                    .addComponent(jButton1))))
                         .addGap(73, 73, 73)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
@@ -189,21 +213,50 @@ public class InformationDisplay extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton2)
-                    .addComponent(jButton1)))
+                    .addComponent(jButton1))
+                .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
+        try {
+            PreparedStatement statement = connected.prepareStatement("SELECT * from Persons");
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                if (Contact.equals(resultSet.getString("ContactNo"))) {
+                    Id = resultSet.getString("Id");
+                }
+            }
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+            String Security = null;
+            String time = dtf.format(now);
+            String GuestId = jLabel7.getText();
+            statement = connected.prepareStatement("Select SecurityId From Security Where Username='" + UserName + "' AND Password='" + Password + "'");
+            resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                Security = Integer.toString(resultSet.getInt(1));
+            }
+            statement = connected.prepareStatement("Insert into Visitor(EntryId,GuestId,SecurityId,EntryTime) values('V" + time + "','" + GuestId + "','" + Security + "','" + time + "')");
+            statement.execute();
+            statement = connected.prepareStatement("Insert into Vis_Per(PersonId,VisitorId) values('" + Id + "','V" + time + "')");
+            statement.execute();
+            this.dispose();
+            JOptionPane.showMessageDialog(null, "Data Successfully Inserted");
+            SecurityInfo.main(null);
+        } catch (SQLException e) {
+            System.out.println("Error found at InformationDisplay");
+            System.out.println("Error: " + e);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -246,9 +299,13 @@ public class InformationDisplay extends javax.swing.JFrame {
     private void jTable2MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable2MousePressed
         // TODO add your handling code here:
         int row = jTable2.getSelectedRow();
-        jTextField2.setText(jTable2.getModel().getValueAt(row,0).toString());
-        jLabel9.setText(jTable2.getModel().getValueAt(row,1).toString());
+        jTextField2.setText(jTable2.getModel().getValueAt(row, 0).toString());
+        jLabel9.setText(jTable2.getModel().getValueAt(row, 1).toString());
+        Contact = getString(jTable2.getModel().getValueAt(row, 2).toString());
     }//GEN-LAST:event_jTable2MousePressed
+    String getString(String s) {
+        return s;
+    }
 
     /**
      * @param args the command line arguments

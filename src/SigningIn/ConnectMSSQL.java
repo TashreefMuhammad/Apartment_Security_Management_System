@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import Security.*;
+import Admin.*;
 
 public class ConnectMSSQL {
     public static Connection connected;
@@ -20,8 +21,20 @@ public class ConnectMSSQL {
             PreparedStatement statement = connection.prepareStatement("SELECT * from "+ s3);
             boolean f = false;
             if (s3.equals("Admin")) {
-                JOptionPane.showMessageDialog(null, "This part is not completed yet. Sorry for inconvenience");
-                Login.main(null);
+                ResultSet resultSet = statement.executeQuery();
+                while (resultSet.next()) {
+                    if ((s2.equals(resultSet.getString("Password")) && s1.equals(resultSet.getString("Username")))) {
+                        f = true;
+                        break;
+                    }
+                }
+                if(f){
+                    AdminInfo.main(null);
+                }
+                else {
+                    JOptionPane.showMessageDialog(null, "Incorrect Information");
+                    Login.main(null);
+                }
             } else if (s3.equals("Security")) {
                 ResultSet resultSet = statement.executeQuery();
                 while (resultSet.next()) {

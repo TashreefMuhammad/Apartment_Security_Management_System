@@ -22,7 +22,7 @@ Drop table Persons
 Create table Persons
 (
 	Id varchar(20) primary key,
-	FlatNo int unique not null,
+	FlatNo int not null,
 	Name varchar(30) not null,
 	Age int not null,
 	Profession varchar(20) not null,
@@ -52,9 +52,9 @@ Create table Security
 Create table Payments
 (
 	Id int identity(40001,1) primary key,
-	FlatNo int foreign key references Persons(FlatNo),
+	FlatNo int,
 	DateofPayment date not null,
-	DueCharges int 
+	PaidFor varchar(255) 
 );
 
 Create table GuestInfo
@@ -68,7 +68,7 @@ Create table Visitor
 (
 	EntryId varchar(25) primary key,
 	GuestId int foreign key references GuestInfo(GuestId),
-	SecurityId int foreign key references Security(SecurityId),
+	SecurityId int foreign key references Security(SecurityId) on Delete set null,
 	EntryTime datetime not null
 );
 
@@ -77,7 +77,7 @@ Create table ParkingSlot
 	SlotNo int identity(70001,1) primary key,
 	Status varchar(10) not null,
 	SlotOwnerId varchar(20) foreign key references Persons(Id),
-	SlotUserId varchar(20) unique
+	SlotUserId varchar(20)
 );
 
 Create table ParkingRecord
@@ -118,13 +118,13 @@ values('Bellal Hossen','Bellal01','Bellal240'),
 	  ('Asaduzzaman','Zaman05','Lutfur301'),
 	  ('Kamran Rahman','Kamran02','Kamran150')
 
-Insert into Payments(FlatNo,DateofPayment,DueCharges)
-values(201,'2019-09-17',40580),
-	  (102,'2019-09-01',42117),
-	  (402,'2019-08-20',1700),
-	  (101,'2019-09-15',4200),
-	  (302,'2019-09-17',5000),
-	  (201,'2019-09-10',7190)
+Insert into Payments(FlatNo,DateofPayment,PaidFor)
+values(201,'2019-09-17','October-2019'),
+	  (102,'2019-09-01','October-2019'),
+	  (402,'2019-08-20','October-2019'),
+	  (101,'2019-09-15','October-2019'),
+	  (302,'2019-09-17','October-2019'),
+	  (201,'2019-09-10','October-2019')
 
 Insert into GuestInfo(GuestName,ContactNo)
 values('Rumana Polli','01754286193'),
@@ -140,17 +140,19 @@ values('V2019-02-28 22:13:34',50003,30002,'2019-02-28 22:13:34'),
 	  ('V2019-01-23 18:11:23',50002,30001,'2019-01-23 18:11:23'),
 	  ('V2019-02-11 16:44:05',50002,30003,'2019-02-11 16:44:05'),
 	  ('V2019-04-22 12:01:18',50004,30004,'2019-02-28 12:01:18'),
-	  ('V2019-07-18 15:11:47',50001,30005,'2019-07-18 15:11:47')
+	  ('V2019-07-18 15:11:47',50001,30005,'2019-07-18 15:11:47'),
+	  ('V2019-07-20 16:13:37',50005,30002,'2019-07-20 16:13:37'),
+	  ('V2019-08-23 22:48:46',50006,30005,'2019-08-23 22:48:46')
 
 Insert into ParkingSlot(Status,SlotOwnerId,SlotUserId)
 values('Occupied','2170458632','2170458632'),
 	  ('Occupied','2569387410','2569387410'),
 	  ('Occupied','2569387410','2102563987'),
 	  ('Unoccupied','2125463917',''),
-	  ('Unoccupied','1526486321','1526486321')
+	  ('Unoccupied','1526486321','')
 
 Insert into ParkingRecord(RecordNo,VehicleNo,ParkingSlotNo,EntryTime,ExitTime)
-values  ('P-2019-07-13 17:48:43','DHA MET 13-2586',70002,'2019-07-13 17:48:43','2019-07-14 14:13:25'),
+values  ('P-2019-07-13 17:48:43','DHA MET 13-2586',70002,'2019-07-13 17:48:43','2019-07-14 18:13:25'),
 		('P-2019-08-17 18:41:13','DHA MET 12-6354',70001,'2019-08-17 18:41:13','2019-08-17 21:38:58'),
 		('P-2019-08-13 11:18:44','DHA MET 34-2623',70002,'2019-08-13 11:18:44','2019-08-15 15:21:35'),
 		('P-2019-08-13 15:04:14','DHA MET 27-2256',70005,'2019-08-13 15:04:14','2019-09-15 19:58:36'),
